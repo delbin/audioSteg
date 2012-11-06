@@ -1,20 +1,25 @@
 #!/usr/bin/python
 
+#function to hide message to audio file
+#execution: hide.py 
+
 import sys
 import math
 import wave
 import bit
 import rc4
 
-f=wave.open("Msg.wav","r")
+f=wave.open("Msg.wav","r") #opening the carrier file
 
+#getting parameters
 numframes=f.getnframes()
 channels=f.getnchannels()
 sampwidth=f.getsampwidth()
 framerate=f.getframerate()
 comptype=f.getcomptype()
 data=f.readframes(numframes)
-f.close()
+
+f.close()	#closing carrier file after reading all parameters
 
 frames=[ord(c) for c in data]
 
@@ -24,22 +29,18 @@ integerrep=[ord(c) for c in msg]
 framecount=44;
 
 length=len(msg)
-print "Length of the message ", length*8
 
-#if (length*8 > (numframes*4-44)):
-#	print ("The text is too long for the selected .wav file")
-#	sys.exit(0)
 	
 base=math.ceil(math.log((((numframes*4)-44)/8) , 2))
-	
-#print base
-print int(base)
 
+#encoding message length to frames
 for j in range(0,int(base)):
 		frames[framecount]=bit.changeLSB(frames[framecount],bit.getbit(length,j))
 		framecount=framecount+1
 
-K=rc4.keyarray(length*8, key)		
+K=rc4.keyarray(length*8, key) #rc4 random key generation using the input key
+
+#encoding message upto message length
 count=0
 for i in range(0,length):
 	for j in range(0,8):
@@ -49,8 +50,10 @@ for i in range(0,length):
 
 		
 output=[chr(c) for c in frames]
-print len(frames)
-out=wave.open("output.wav","w")
+
+out=wave.open("output.wav","w")	 #opening new file, which will have hidden message
+
+#setting parameters
 out.setnchannels(channels)
 out.setsampwidth(sampwidth)
 out.setframerate(framerate)
@@ -58,6 +61,6 @@ out.setnframes(numframes)
 out.setcomptype(comptype, 'NONE')
 
 for i in range(0, len(output)):
-	out.writeframes(output[i])
+	out.writeframes(output[i]) #writing output file.
 
 

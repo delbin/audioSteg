@@ -1,3 +1,8 @@
+#!/usr/bin/python
+
+#function to extract hidden message from audio file
+#execution: extract.py 
+
 from __future__ import print_function
 import wave
 import math
@@ -16,12 +21,16 @@ key= raw_input("Enter the key:")
 
 base=math.ceil(math.log((((numframes*4)-44)/8) , 2))
 
+
+#getting the length of message encoded
 for j in range(0,int(base)):
 		length=length + (2**j) *(frames2[framecount] & 1 )
 		framecount = framecount + 1
 		
 count=0
-K=rc4.keyarray(length*8, key)
+K=rc4.keyarray(length*8, key) #rc4 random key generation using the input key
+
+#getting the message upto message length
 for i in range(0,length):
 	number=0
 	for j in range(0,8):
